@@ -87,7 +87,39 @@ export default function Home() {
 
   const getChartData = (filename: string) => {
     const resumeData = getResumeDetails(filename);
-    if (!resumeData) return null;
+    if (!resumeData) {
+      // Return a default chart data object if no resume data is found
+      return {
+        labels: [
+          "Keyword Match",
+          "Semantic Match",
+          "Skill Match",
+          "Experience Match",
+          "Education Match",
+        ],
+        datasets: [
+          {
+            label: "Score (%)",
+            data: [0, 0, 0, 0, 0], // Default to zero scores
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.6)",
+              "rgba(54, 162, 235, 0.6)",
+              "rgba(255, 206, 86, 0.6)",
+              "rgba(75, 192, 192, 0.6)",
+              "rgba(153, 102, 255, 0.6)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+              "rgba(75, 192, 192, 1)",
+              "rgba(153, 102, 255, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+    }
 
     return {
       labels: [
@@ -239,19 +271,17 @@ export default function Home() {
                   
                   <div className="mt-4">
                     <h3 className="font-semibold text-gray-800 mb-2">Score Breakdown</h3>
-                    {getChartData(selectedResume) && (
-                      <Bar 
-                        data={getChartData(selectedResume)} 
-                        options={{
-                          scales: {
-                            y: {
-                              beginAtZero: true,
-                              max: 100
-                            }
+                    <Bar 
+                      data={getChartData(selectedResume)} 
+                      options={{
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            max: 100
                           }
-                        }}
-                      />
-                    )}
+                        }
+                      }}
+                    />
                   </div>
                   
                   <div className="mt-6 grid grid-cols-2 gap-4">
