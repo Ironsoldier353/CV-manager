@@ -47,35 +47,39 @@ export default function Home() {
       alert("Please enter a job description");
       return;
     }
-
+  
     if (resumes.length === 0) {
       alert("Please upload at least one resume");
       return;
     }
-
+  
     setLoading(true);
-    const formData = new FormData();
-    formData.append("job_description", jobDescription);
-    resumes.forEach((resume) => formData.append("resumes", resume));
-
+  
     try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
+      const formData = new FormData();
+      formData.append("job_description", jobDescription);
+      resumes.forEach((resume) => formData.append("resumes", resume));
+      
+      const response = await fetch('https://cv-manager-qwej.onrender.com/rank-resumes/', {
+        method: 'POST',
         body: formData,
       });
-
+      
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Server error: ${errorText}`);
+        console.error('Backend error:', response.status, errorText);
+        throw new Error('Error connecting to backend');
       }
-
+      
       const data = await response.json();
-      setRankedResumes(data.ranked_resumes || []);
-      setDetailedResults(data.detailed_results || []);
-      setSelectedResume(null);
+      // Here you need to handle the successful response
+      // For example: setResults(data);
+      console.log("Ranked resumes:", data);
+      return data;
     } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while processing your request");
+      console.error('Error:', error);
+      alert("An error occurred while processing your request. Please try again.");
+      // Handle error appropriately
     } finally {
       setLoading(false);
     }
