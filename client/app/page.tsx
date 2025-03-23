@@ -28,12 +28,6 @@ type ResumeResult = {
   phone: string;
 };
 
-type JobAnalysis = {
-  extracted_keywords: string[];
-  required_experience: number;
-  required_education: string | null;
-};
-
 export default function Home() {
   const [jobDescription, setJobDescription] = useState<string>("");
   const [resumes, setResumes] = useState<File[]>([]);
