@@ -23,6 +23,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
+
 def extract_text_from_pdf(file: UploadFile) -> str:
     try:
         file.file.seek(0)  # Reset file pointer before reading
