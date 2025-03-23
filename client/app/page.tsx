@@ -39,7 +39,6 @@ export default function Home() {
   const [resumes, setResumes] = useState<File[]>([]);
   const [rankedResumes, setRankedResumes] = useState<[string, string, number][]>([]);
   const [detailedResults, setDetailedResults] = useState<ResumeResult[]>([]);
-  const [jobAnalysis, setJobAnalysis] = useState<JobAnalysis | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedResume, setSelectedResume] = useState<string | null>(null);
 
@@ -72,17 +71,16 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        alert("An error occurred while processing your request");
-        setLoading(false);
-        return;
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
 
       const data = await response.json();
       setRankedResumes(data.ranked_resumes || []);
       setDetailedResults(data.detailed_results || []);
-      setJobAnalysis(data.job_analysis || null);
       setSelectedResume(null);
     } catch (error) {
+      console.error("Error:", error);
       alert("An error occurred while processing your request");
     } finally {
       setLoading(false);
@@ -211,15 +209,12 @@ export default function Home() {
             <div className="bg-white p-6 rounded-lg shadow-md col-span-2">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Resume Analysis</h2>
               
-              {/* Safe access to resume details */}
               {getResumeDetails(selectedResume) && (
                 <>
-                  {/* File info/name */}
                   <div className="text-sm text-gray-500 mb-4 p-2 bg-gray-100 rounded-md">
                     <strong>File:</strong> {getResumeDetails(selectedResume)?.filename}
                   </div>
                   
-                  {/* Candidate Information */}
                   <div className="mb-6 bg-blue-50 p-4 rounded-md">
                     <h3 className="font-semibold text-blue-800 mb-2">Candidate Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -242,16 +237,12 @@ export default function Home() {
                       <div className="flex flex-col col-span-2">
                         <span className="text-sm text-blue-600">Education</span>
                         <span className="font-medium text-blue-800">
-                          {getResumeDetails(selectedResume)?.education && 
-                           Array.isArray(getResumeDetails(selectedResume)?.education) ? 
-                           getResumeDetails(selectedResume)?.education.join(", ") : 
-                           "Not detected"}
+                          {getResumeDetails(selectedResume)?.education?.join(", ") || "Not detected"}
                         </span>
                       </div>
                     </div>
                   </div>
                   
-                  {/* Chart for detailed data*/}
                   <div className="mt-4">
                     <h3 className="font-semibold text-gray-800 mb-2">Score Breakdown</h3>
                     {getChartData(selectedResume) && (
@@ -269,7 +260,6 @@ export default function Home() {
                     )}
                   </div>
                   
-                  {/* Detailed scores */}
                   <div className="mt-6 grid grid-cols-2 gap-4">
                     <div className="bg-gray-50 p-3 rounded-md">
                       <span className="text-sm text-gray-600">Overall Score</span>
