@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
 
     // Forward the request to your FastAPI backend
-    const backendResponse = await fetch('http://localhost:8000/rank-resumes/', {
+    const backendResponse = await fetch('https://cv-manager-qwej.onrender.com/rank-resumes/', {
       method: 'POST',
       body: formData,
     });
