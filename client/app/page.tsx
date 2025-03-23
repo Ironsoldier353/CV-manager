@@ -89,7 +89,7 @@ export default function Home() {
     }
   };
 
-  const getResumeDetails = (filename: string) => {
+  const getResumeDetails = (filename: string): ResumeResult | undefined => {
     return detailedResults.find((result) => result.filename === filename);
   };
 
@@ -197,7 +197,7 @@ export default function Home() {
                     <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-2">
                       {index + 1}
                     </span>
-                    <span className="font-medium">{displayName}</span>
+                    <span className="font-medium text-black">{displayName}</span>
                   </div>
                   <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">
                     {score}%
@@ -211,73 +211,81 @@ export default function Home() {
             <div className="bg-white p-6 rounded-lg shadow-md col-span-2">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Resume Analysis</h2>
               
-              {/* Candidate Information in the result */}
+              {/* Safe access to resume details */}
               {getResumeDetails(selectedResume) && (
-                <div className="mb-6 bg-blue-50 p-4 rounded-md">
-                  <h3 className="font-semibold text-blue-800 mb-2">Candidate Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="flex flex-col">
-                      <span className="text-sm text-blue-600">Name</span>
-                      <span className="font-medium">{getResumeDetails(selectedResume)?.name || "Not detected"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-blue-600">Email</span>
-                      <span className="font-medium">{getResumeDetails(selectedResume)?.email || "Not detected"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-blue-600">Phone</span>
-                      <span className="font-medium">{getResumeDetails(selectedResume)?.phone || "Not detected"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-blue-600">Experience</span>
-                      <span className="font-medium">{getResumeDetails(selectedResume)?.years_experience || "0"} years</span>
-                    </div>
-                    <div className="flex flex-col col-span-2">
-                      <span className="text-sm text-blue-600">Education</span>
-                      <span className="font-medium">{getResumeDetails(selectedResume)?.education.join(", ") || "Not detected"}</span>
+                <>
+                  {/* File info/name */}
+                  <div className="text-sm text-gray-500 mb-4 p-2 bg-gray-100 rounded-md">
+                    <strong>File:</strong> {getResumeDetails(selectedResume)?.filename}
+                  </div>
+                  
+                  {/* Candidate Information */}
+                  <div className="mb-6 bg-blue-50 p-4 rounded-md">
+                    <h3 className="font-semibold text-blue-800 mb-2">Candidate Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Name</span>
+                        <span className="font-medium text-blue-800 mb-2">{getResumeDetails(selectedResume)?.name || "Not detected"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Email</span>
+                        <span className="font-medium text-blue-800">{getResumeDetails(selectedResume)?.email || "Not detected"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Phone</span>
+                        <span className="font-medium text-blue-800">{getResumeDetails(selectedResume)?.phone || "Not detected"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-blue-600">Experience</span>
+                        <span className="font-medium text-blue-800">{getResumeDetails(selectedResume)?.years_experience || "0"} years</span>
+                      </div>
+                      <div className="flex flex-col col-span-2">
+                        <span className="text-sm text-blue-600">Education</span>
+                        <span className="font-medium text-blue-800">
+                          {getResumeDetails(selectedResume)?.education && 
+                           Array.isArray(getResumeDetails(selectedResume)?.education) ? 
+                           getResumeDetails(selectedResume)?.education.join(", ") : 
+                           "Not detected"}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  
+                  {/* Chart for detailed data*/}
+                  <div className="mt-4">
+                    <h3 className="font-semibold text-gray-800 mb-2">Score Breakdown</h3>
+                    {getChartData(selectedResume) && (
+                      <Bar 
+                        data={getChartData(selectedResume)} 
+                        options={{
+                          scales: {
+                            y: {
+                              beginAtZero: true,
+                              max: 100
+                            }
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
+                  
+                  {/* Detailed scores */}
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <span className="text-sm text-gray-600">Overall Score</span>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {getResumeDetails(selectedResume)?.final_score}%
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <span className="text-sm text-gray-600">Experience Match</span>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {getResumeDetails(selectedResume)?.experience_match}%
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
-              
-              {/* File info/name */}
-              <div className="text-sm text-gray-500 mb-4">
-                File: {getResumeDetails(selectedResume)?.filename}
-              </div>
-              
-              {/* Chart for detailed data*/}
-              <div className="mt-4">
-                <h3 className="font-semibold text-gray-800 mb-2">Score Breakdown</h3>
-                {getChartData(selectedResume) && (
-                  <Bar 
-                    data={getChartData(selectedResume)!} 
-                    options={{
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          max: 100
-                        }
-                      }
-                    }}
-                  />
-                )}
-              </div>
-              
-              {/* Detailed scores */}
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <span className="text-sm text-gray-600">Overall Score</span>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {getResumeDetails(selectedResume)?.final_score}%
-                  </div>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <span className="text-sm text-gray-600">Experience Match</span>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {getResumeDetails(selectedResume)?.experience_match}%
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>
