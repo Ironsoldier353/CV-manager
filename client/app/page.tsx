@@ -72,19 +72,22 @@ export default function Home() {
       }
       
       const data = await response.json();
-      // Here you need to handle the successful response
-      // For example: setResults(data);
       console.log("Ranked resumes:", data);
-      return data;
+      
+      // Update the state with the response data
+      if (data && data.ranked_resumes) {
+        setRankedResumes(data.ranked_resumes);
+      }
+      if (data && data.detailed_results) {
+        setDetailedResults(data.detailed_results);
+      }
     } catch (error) {
       console.error('Error:', error);
       alert("An error occurred while processing your request. Please try again.");
-      // Handle error appropriately
     } finally {
       setLoading(false);
     }
   };
-
   const getResumeDetails = (filename: string): ResumeResult | undefined => {
     return detailedResults.find((result) => result.filename === filename);
   };
