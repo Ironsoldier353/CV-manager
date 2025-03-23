@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import axios from "axios";
 
 export async function POST(request: { formData: () => any; }) {
   try {
@@ -13,22 +12,21 @@ export async function POST(request: { formData: () => any; }) {
     
     if (!backendResponse.ok) {
       console.error('Backend error:', backendResponse.status, backendResponse.statusText);
-      return new Response(
-        JSON.stringify({ error: 'Error connecting to backend service' }), 
-        { status: backendResponse.status, headers: { 'Content-Type': 'application/json' } }
+      const errorText = await backendResponse.text();
+      return NextResponse.json(
+        { error: 'Error connecting to backend service', details: errorText }, 
+        { status: backendResponse.status }
       );
     }
     
     const data = await backendResponse.json();
-    return new Response(JSON.stringify(data), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return NextResponse.json(data);
     
   } catch (error) {
     console.error('API route error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }), 
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    return NextResponse.json(
+      { error: 'Internal server error', details: String(error) }, 
+      { status: 500 }
     );
   }
 }
